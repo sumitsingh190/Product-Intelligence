@@ -1,0 +1,14 @@
+[
+    {
+        "query": "login button broken after update",
+        "relevant_ids": ["REPLACE_WITH_DOC_UUID_1"]
+    },
+    {
+        "query": "passwordless authentication competitor launch",
+        "relevant_ids": ["REPLACE_WITH_DOC_UUID_2", "REPLACE_WITH_INSIGHT_UUID_1"]
+    },
+    {
+        "query": "retention drop mobile users",
+        "relevant_ids": ["REPLACE_WITH_INSIGHT_UUID_2"]
+    }
+]
