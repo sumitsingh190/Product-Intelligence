@@ -17,6 +17,14 @@ from app.models.workspace import Workspace
 
 router=APIRouter()
 
+def _kpis_key(workspace_id: str) -> str:
+    return f"kpi:{workspace_id}:current"
+
+def _kpi_history_key(workspace_id:str, metric: str, days: int) -> str:
+    return f"kpi{workspace_id}:history:{metric}:{days}"
+
+
+
 class KPIPoint(BaseModel):
     metric_name: str
     current_value: float
