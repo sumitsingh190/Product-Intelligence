@@ -381,13 +381,14 @@ Product-Intelligence/
 - Structured Logging
 - Request Monitoring
 - Health Checks
-
+  
 # 🧪 LLM Evaluation
 
-The platform includes a production-ready evaluation framework for continuously validating AI agent performance and retrieval quality.
-Evaluation pipelines support offline benchmarking, regression testing, and automated quality validation for AI agents before deployment.
+The platform includes a production-ready evaluation framework for continuously validating AI agent performance, retrieval quality, and autonomous workflows. Evaluation pipelines support offline benchmarking, regression testing, and automated quality validation before deployment.
 
-### Evaluation Features
+The framework enables continuous quality assurance for AI agents through automated benchmarking, structured scoring, and regression testing.
+
+### Evaluation Capabilities
 
 - LLM-as-Judge
 - Precision / Recall / F1
@@ -395,9 +396,9 @@ Evaluation pipelines support offline benchmarking, regression testing, and autom
 - Rubric-based Scoring
 - Offline Evaluation Suites
 - Regression Testing
-- JSON Evaluation Reports
 - Configurable Pass Rate Thresholds
-
+- JSON Evaluation Reports
+  
 ---
 
 # ⚙️ Local Setup
