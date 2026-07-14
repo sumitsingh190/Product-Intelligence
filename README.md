@@ -152,9 +152,7 @@ end
 
 B --> W
 ```
-```
-
-# 🧠 AI Pipeline
+# 🧠 AI Request Lifecycle
 
 ```mermaid
 sequenceDiagram
