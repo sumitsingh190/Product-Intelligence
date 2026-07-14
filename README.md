@@ -29,12 +29,11 @@ Modern product managers spend hours reviewing customer feedback, engineering tic
 The platform combines transactional data management with analytical processing by leveraging **PostgreSQL** for OLTP workloads and **DuckDB** for high-performance analytical queries, enabling scalable, production-ready product intelligence.
 
 ---
-
 ## 🎯 Problem Statement
 
-Product teams rely on fragmented customer feedback, support tickets, analytics dashboards, engineering data, and competitor insights, making strategic decision-making slow and reactive.
+Product teams often rely on disconnected sources such as customer feedback, support tickets, product analytics, engineering data, and competitor research. Manually consolidating these signals is time-consuming, making prioritization, roadmap planning, and strategic decision-making reactive instead of data-driven.
 
-Product Intelligence unifies these data sources and uses autonomous AI agents, Hybrid RAG, and LLM evaluation to generate actionable recommendations, executive reports, and product insights from a single platform.
+Product Intelligence addresses this challenge by unifying these data sources and leveraging autonomous AI agents, Hybrid RAG, and enterprise analytics to generate contextual recommendations, executive reports, PRDs, and actionable product insights from a single platform.
 ---
 
 # ✨ Key Features
@@ -310,10 +309,11 @@ Product-Intelligence/
 - Hybrid RAG
 - pgvector
 - LLM-as-Judge
-- Embedding Service
-- Semantic Search
-- Reranking
-- Retrieval Pipeline
+- Embedding Models
+- pgvector
+- Hybrid RAG
+- Cross-Encoder Reranking
+  
 ---
 
 ## Analytics
@@ -406,7 +406,7 @@ Evaluation pipelines support offline benchmarking, regression testing, and autom
 ## Clone Repository
 
 ```bash
-git clone https://github.com/<username>/product-intelligence.git
+git clone https://github.com/sumitsingh190/Product-Intelligence.git
 cd product-intelligence
 ```
 
@@ -451,12 +451,12 @@ npm run dev
 - [x] Recommendation Engine
 - [x] Background Workers
 - [x] Observability
-- [ ] LangGraph Orchestration
-- [ ] Vector Database Integration
-- [ ] Multi-Agent Collaboration
-- [ ] Real-time Streaming
-- [ ] Slack Integration
-- [ ] Kubernetes Deployment
+- [x] Advanced Multi-Agent Planning
+- [x] Advanced Hybrid Retrieval Optimization
+- [x] Multi-Agent Collaboration
+- [x] Real-time Streaming
+- [x] Slack Integration
+- [x] Kubernetes Deployment
 
 ---
 
