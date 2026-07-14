@@ -151,7 +151,8 @@ Y["Health Checks"]
 end
 
 B --> W
-```---
+```
+```
 
 # 🧠 AI Pipeline
 
