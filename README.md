@@ -382,7 +382,7 @@ Product-Intelligence/
 - Request Monitoring
 - Health Checks
 
-  # 🧪 LLM Evaluation
+# 🧪 LLM Evaluation
 
 The platform includes a production-ready evaluation framework for continuously validating AI agent performance and retrieval quality.
 Evaluation pipelines support offline benchmarking, regression testing, and automated quality validation for AI agents before deployment.
