@@ -93,80 +93,143 @@ The platform combines transactional data management with analytical processing b
 
 ---
 
-# 🏗 System Architecture
+# 🏗️ System Architecture
 
 ```text
-                     External Data Sources
-┌──────────────────────────────────────────────────────────┐
-│                                                          │
-│ Customer Feedback    Jira     GitHub     CSV Uploads     │
-│ Competitor Data      Product Analytics     Support Data  │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-                ETL & Connector Layer
-                          │
-                          ▼
-                  PostgreSQL Database
-                          │
-          Periodic Analytics Synchronization
-                          ▼
-                  DuckDB Analytics Engine
-                          │
-                          ▼
-               AI Intelligence Layer
-     ┌────────────────────────────────────────┐
-     │ Customer Agent                         │
-     │ Competitor Agent                       │
-     │ Engineering Agent                      │
-     │ Product Analytics Agent                │
-     │ Strategy Agent                         │
-     │ Executive Reporting Agent              │
-     └────────────────────────────────────────┘
-                          │
-                          ▼
-                Recommendation Engine
-                          │
-                          ▼
-                  FastAPI REST APIs
-                          │
-                          ▼
-            React + TypeScript Dashboard
-```
+                                        ┌────────────────────────────────────────────┐
+                                        │              Frontend (React)              │
+                                        │--------------------------------------------│
+                                        │ Dashboard │ Search │ Reports │ Analytics   │
+                                        │ Competitors │ Insights │ Workspaces        │
+                                        └─────────────────┬──────────────────────────┘
+                                                          │
+                                                HTTPS / REST APIs
+                                                          │
+                                                          ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                              FastAPI Backend (API Gateway)                                │
+│--------------------------------------------------------------------------------------------│
+│ Authentication │ Workspace Management │ Search │ Analytics │ Reports │ Recommendations     │
+│ Agent APIs │ Connectors │ Upload APIs │ Notification APIs │ Health APIs                  │
+└───────────────┬────────────────────────────────────────────────────────────────────────────┘
+                │
+      JWT Authentication + RBAC
+                │
+                ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                             Service & Business Logic Layer                                 │
+│--------------------------------------------------------------------------------------------│
+│ User Service │ Product Service │ Analytics Service │ Recommendation Service                │
+│ Search Service │ Report Service │ Notification Service │ Workspace Service                 │
+└────────────────────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                             AI Orchestration Layer                                         │
+│--------------------------------------------------------------------------------------------│
+│ Planner Agent │ Dynamic Tool Calling │ Memory │ Prompt Management │ Evaluation             │
+└───────────────┬────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                               Specialized AI Agents                                        │
+│--------------------------------------------------------------------------------------------│
+│ Customer Intelligence Agent                                                                │
+│ Product Analytics Agent                                                                    │
+│ Engineering Health Agent                                                                   │
+│ Competitor Intelligence Agent                                                              │
+│ Executive Reporting Agent                                                                  │
+│ Product Strategy Agent                                                                     │
+│ PRD Generation Agent                                                                       │
+└───────────────┬────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                          Dynamic Tool Execution Layer                                      │
+│--------------------------------------------------------------------------------------------│
+│ Semantic Search │ KPI Analytics │ Report Generator │ Recommendation Engine                 │
+│ GitHub Connector │ Jira Connector │ CSV Import │ Competitor Scraper                       │
+│ Email │ Slack │ Embedding Service │ Reranker                                         │
+└───────────────┬────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                            Background Processing                                           │
+│--------------------------------------------------------------------------------------------│
+│ Celery Workers │ Redis Queue │ Scheduled ETL │ Background Reports │ Embedding Jobs         │
+└───────────────┬────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                  Data Layer                                                │
+│--------------------------------------------------------------------------------------------│
+│ PostgreSQL (OLTP)                                                                          │
+│ DuckDB (OLAP Analytics)                                                                    │
+│ Redis (Cache & Broker)                                                                     │
+└───────────────┬────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                           External Data Sources                                            │
+│--------------------------------------------------------------------------------------------│
+│ Customer Feedback │ GitHub │ Jira │ CSV │ Competitor Websites │ Product Metrics            │
+└────────────────────────────────────────────────────────────────────────────────────────────┘
 
+                                      Observability
+
+                    Prometheus • Grafana • Structlog • Health Checks
+```
 ---
 
 # 🧠 AI Pipeline
 
+## 🔄 End-to-End Workflow
+
 ```text
-Raw Data
-    │
-    ▼
-Data Connectors
-    │
-    ▼
-ETL Pipeline
-    │
-    ▼
-Data Cleaning
-    │
-    ▼
-Embeddings
-    │
-    ▼
-Semantic Retrieval
-    │
-    ▼
-Agent Analysis
-    │
-    ▼
-Recommendations
-    │
-    ▼
+User
+ │
+ ▼
+React Dashboard
+ │
+ ▼
+FastAPI API Gateway
+ │
+ ▼
+JWT Authentication + RBAC
+ │
+ ▼
+Business Services
+ │
+ ▼
+Planner Agent
+ │
+ ▼
+Dynamic Tool Calling
+ │
+ ├──────────────┐
+ ▼              ▼
+AI Agents     External Tools
+ │              │
+ │        GitHub / Jira / CSV
+ │              │
+ ▼              ▼
+Embedding + Retrieval + Analytics
+ │
+ ▼
+Recommendation Engine
+ │
+ ▼
+DuckDB Analytics
+ │
+ ▼
+PostgreSQL
+ │
+ ▼
+JSON Response
+ │
+ ▼
 Dashboard
 ```
-
 ---
 
 # 📂 Project Structure
