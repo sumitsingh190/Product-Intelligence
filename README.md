@@ -308,11 +308,9 @@ Product-Intelligence/
 - Multi-Agent AI
 - Hybrid RAG
 - pgvector
-- LLM-as-Judge
 - Embedding Models
-- pgvector
-- Hybrid RAG
 - Cross-Encoder Reranking
+- LLM-as-Judge
   
 ---
 
@@ -407,7 +405,7 @@ Evaluation pipelines support offline benchmarking, regression testing, and autom
 
 ```bash
 git clone https://github.com/sumitsingh190/Product-Intelligence.git
-cd product-intelligence
+cd Product-Intelligence
 ```
 
 ---
@@ -454,9 +452,9 @@ npm run dev
 - [x] Advanced Multi-Agent Planning
 - [x] Advanced Hybrid Retrieval Optimization
 - [x] Multi-Agent Collaboration
-- [x] Real-time Streaming
-- [x] Slack Integration
-- [x] Kubernetes Deployment
+- [ ] Real-time Streaming
+- [ ] Slack Integration
+- [ ] Kubernetes Deployment
 
 ---
 
