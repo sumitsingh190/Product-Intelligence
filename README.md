@@ -10,6 +10,10 @@
 ![DuckDB](https://img.shields.io/badge/DuckDB-Analytics-yellow)
 ![Redis](https://img.shields.io/badge/Redis-Cache-red?logo=redis)
 ![Celery](https://img.shields.io/badge/Celery-Background-green)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agentic%20AI-blueviolet)
+![pgvector](https://img.shields.io/badge/pgvector-Vector%20Search-blue)
+![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-orange?logo=prometheus)
+![Grafana](https://img.shields.io/badge/Grafana-Dashboard-F46800?logo=grafana)
 ![License](https://img.shields.io/badge/License-MIT-success)
 
 </p>
@@ -26,7 +30,24 @@ The platform combines transactional data management with analytical processing b
 
 ---
 
+## 🎯 Problem Statement
+
+Product teams rely on fragmented customer feedback, support tickets, analytics dashboards, engineering data, and competitor insights, making strategic decision-making slow and reactive.
+
+Product Intelligence unifies these data sources and uses autonomous AI agents, Hybrid RAG, and LLM evaluation to generate actionable recommendations, executive reports, and product insights from a single platform.
+---
+
 # ✨ Key Features
+
+## 🎯 Key Highlights
+
+- 🤖 7 Specialized AI Agents
+- 🔍 Hybrid RAG Pipeline (pgvector + PostgreSQL FTS + RRF + Reranking)
+- 🧠 LLM-as-Judge Evaluation Framework
+- 📊 DuckDB Analytics Engine
+- ⚡ FastAPI + Celery Backend
+- 📈 Prometheus & Grafana Monitoring
+- 🔐 JWT + RBAC Security
 
 ### 🤖 Multi-Agent AI System
 
@@ -53,10 +74,11 @@ The platform combines transactional data management with analytical processing b
 
 ### 🔍 AI Search
 
-- Semantic Search
-- Embedding-based Retrieval
-- Intelligent Ranking
-- Context-aware Search
+- Hybrid RAG
+- pgvector Retrieval
+- PostgreSQL Full-Text Search
+- Reciprocal Rank Fusion (RRF)
+- Cross-Encoder Reranking
 
 ---
 
@@ -122,35 +144,42 @@ G4 --> H
 G5 --> H
 G6 --> H
 
-H --> I["Semantic Search"]
-H --> J["Embedding Service"]
-H --> K["Reranker"]
-H --> L["Analytics Engine"]
-H --> M["Recommendation Engine"]
-H --> N["GitHub Connector"]
-H --> O["Jira Connector"]
-H --> P["CSV Import"]
-H --> Q["Report Generator"]
+H --> I["Hybrid RAG"]
+I --> J["Embedding Service"]
+I --> K["pgvector Search"]
+I --> L["PostgreSQL FTS"]
+K --> M["Reciprocal Rank Fusion (RRF)"]
+L --> M
+M --> N["Cross-Encoder Reranker"]
 
-L --> R["DuckDB"]
-M --> S["PostgreSQL"]
+H --> O["Analytics Engine"]
+H --> P["Recommendation Engine"]
+H --> Q["GitHub Connector"]
+H --> R["Jira Connector"]
+H --> S["CSV Import"]
+H --> T["Report Generator"]
+H --> U["LLM Evaluation"]
 
-B --> T["Celery Workers"]
-T --> U["Redis"]
+O --> V["DuckDB"]
+P --> W["PostgreSQL"]
 
-R --> V["Product Analytics"]
-S --> V
-U --> V
+B --> X["Celery Workers"]
+X --> Y["Redis"]
 
-V --> A
+V --> Z["Product Analytics"]
+W --> Z
+Y --> Z
+
+U --> Z
+Z --> A
 
 subgraph Monitoring
-W["Prometheus"]
-X["Grafana"]
-Y["Health Checks"]
+AA["Prometheus"]
+AB["Grafana"]
+AC["Health Checks"]
 end
 
-B --> W
+B --> AA
 ```
 # 🧠 AI Request Lifecycle
 
@@ -164,36 +193,26 @@ participant Auth
 participant Planner
 participant Agent
 participant Tools
-participant DB
+participant HybridRAG
+participant LLM
+participant Eval
 participant Dashboard
 
 User->>Frontend: Submit Query
-
 Frontend->>API: REST Request
-
 API->>Auth: Validate JWT
-
 Auth-->>API: Authorized
-
 API->>Planner: Forward Request
-
 Planner->>Agent: Select Best Agent
-
 Agent->>Tools: Dynamic Tool Calling
-
-Tools->>DB: Search / Analytics
-
-DB-->>Tools: Results
-
-Tools-->>Agent: Retrieved Context
-
-Agent-->>Planner: AI Response
-
-Planner-->>API: Final Recommendation
-
+Tools->>HybridRAG: Retrieve Context
+HybridRAG-->>Agent: Ranked Results
+Agent->>LLM: Generate Response
+LLM-->>Eval: LLM-as-Judge Evaluation
+Eval-->>Planner: Quality Score
+Planner-->>API: Final Response
 API-->>Frontend: JSON Response
-
-Frontend-->>User: Visual Dashboard
+Frontend-->>User: Interactive Dashboard
 ```
 ---
 
@@ -203,31 +222,46 @@ Frontend-->>User: Visual Dashboard
 Product-Intelligence/
 
 ├── backend/
-│   ├── agents/
-│   ├── analytics/
-│   ├── api/
-│   ├── auth/
-│   ├── connectors/
-│   ├── core/
-│   ├── database/
-│   ├── embeddings/
-│   ├── etl/
-│   ├── middleware/
-│   ├── models/
-│   ├── notifications/
-│   ├── observability/
-│   ├── services/
-│   ├── tasks/
-│   └── utils/
+│   └── app/
+│       ├── agents/
+│       │   ├── analytics_agent.py
+│       │   ├── competitor_agent.py
+│       │   ├── customer_intelligence_agent.py
+│       │   ├── engineering_agent.py
+│       │   ├── executive_reporting_agent.py
+│       │   ├── planner_agent.py
+│       │   ├── prd_agent.py
+│       │   ├── product_strategy_agent.py
+│       │   ├── sprint_plan_agent.py
+│       │   ├── tools.py
+│       │   ├── validator.py
+│       │   └── evals/
+│       │       ├── judge.py
+│       │       ├── metrics.py
+│       │       ├── runner.py
+│       │       ├── eval_customer_intelligence.py
+│       │       ├── eval_product_strategy.py
+│       │       └── eval_prd.py
+│       │
+│       ├── analytics/
+│       ├── api/
+│       ├── connectors/
+│       ├── core/
+│       ├── embeddings/
+│       ├── etl/
+│       ├── models/
+│       ├── notifications/
+│       ├── observability/
+│       ├── schemas/
+│       ├── services/
+│       ├── tasks/
+│       ├── utils/
+│       ├── database.py
+│       ├── deps.py
+│       ├── config.py
+│       └── main.py
 │
 ├── frontend/
-│   ├── components/
-│   ├── pages/
-│   ├── hooks/
-│   ├── store/
-│   ├── services/
-│   ├── layouts/
-│   └── assets/
 │
 ├── infrastructure/
 │   ├── docker/
@@ -271,12 +305,15 @@ Product-Intelligence/
 
 ## AI & ML
 
-- LLM Integration
+- LangGraph
+- Multi-Agent AI
+- Hybrid RAG
+- pgvector
+- LLM-as-Judge
 - Embedding Service
 - Semantic Search
+- Reranking
 - Retrieval Pipeline
-- Multi-Agent Framework
-
 ---
 
 ## Analytics
@@ -301,6 +338,8 @@ Product-Intelligence/
 
 ✅ Product Analytics
 
+✅ AI Agent Orchestration
+
 ✅ Customer Intelligence
 
 ✅ Semantic Search
@@ -318,6 +357,10 @@ Product-Intelligence/
 ✅ Product Insights
 
 ✅ Workspace Management
+
+✅ Hybrid RAG
+
+✅ LLM Evaluation
 
 ---
 
@@ -339,6 +382,22 @@ Product-Intelligence/
 - Structured Logging
 - Request Monitoring
 - Health Checks
+
+  # 🧪 LLM Evaluation
+
+The platform includes a production-ready evaluation framework for continuously validating AI agent performance and retrieval quality.
+Evaluation pipelines support offline benchmarking, regression testing, and automated quality validation for AI agents before deployment.
+
+### Evaluation Features
+
+- LLM-as-Judge
+- Precision / Recall / F1
+- NDCG@K Ranking Evaluation
+- Rubric-based Scoring
+- Offline Evaluation Suites
+- Regression Testing
+- JSON Evaluation Reports
+- Configurable Pass Rate Thresholds
 
 ---
 
@@ -394,6 +453,7 @@ npm run dev
 - [x] Observability
 - [ ] LangGraph Orchestration
 - [ ] Vector Database Integration
+- [ ] Multi-Agent Collaboration
 - [ ] Real-time Streaming
 - [ ] Slack Integration
 - [ ] Kubernetes Deployment
