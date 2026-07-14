@@ -156,52 +156,46 @@ B --> W
 
 # 🧠 AI Pipeline
 
-## 🔄 End-to-End Workflow
+```mermaid
+sequenceDiagram
 
-```text
-User
- │
- ▼
-React Dashboard
- │
- ▼
-FastAPI API Gateway
- │
- ▼
-JWT Authentication + RBAC
- │
- ▼
-Business Services
- │
- ▼
-Planner Agent
- │
- ▼
-Dynamic Tool Calling
- │
- ├──────────────┐
- ▼              ▼
-AI Agents     External Tools
- │              │
- │        GitHub / Jira / CSV
- │              │
- ▼              ▼
-Embedding + Retrieval + Analytics
- │
- ▼
-Recommendation Engine
- │
- ▼
-DuckDB Analytics
- │
- ▼
-PostgreSQL
- │
- ▼
-JSON Response
- │
- ▼
-Dashboard
+participant User
+participant Frontend
+participant API
+participant Auth
+participant Planner
+participant Agent
+participant Tools
+participant DB
+participant Dashboard
+
+User->>Frontend: Submit Query
+
+Frontend->>API: REST Request
+
+API->>Auth: Validate JWT
+
+Auth-->>API: Authorized
+
+API->>Planner: Forward Request
+
+Planner->>Agent: Select Best Agent
+
+Agent->>Tools: Dynamic Tool Calling
+
+Tools->>DB: Search / Analytics
+
+DB-->>Tools: Results
+
+Tools-->>Agent: Retrieved Context
+
+Agent-->>Planner: AI Response
+
+Planner-->>API: Final Recommendation
+
+API-->>Frontend: JSON Response
+
+Frontend-->>User: Visual Dashboard
 ```
 ---
 
