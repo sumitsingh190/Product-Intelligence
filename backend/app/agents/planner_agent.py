@@ -142,7 +142,7 @@ class PlannerAgent(BaseAgent):
             result=await self.analytics_agent.run( 
                 state["workspace_id"], state.get("context", {})
             )
-            state["context"]["analytics"] 
+            state["context"]["analytics"] = result
         except Exception as e: 
             result = log.warning("analytics_failed", error=str(e)) 
             state["context"]["analytics"] = {"kpis": {}, "error": str(e)}
@@ -153,7 +153,7 @@ class PlannerAgent(BaseAgent):
             result=await self.engineering_agent.run( 
                 state["workspace_id"], state.get("context", {})
             )
-            state["context"][" engineering"] = result
+            state["context"]["engineering"] = result
         except Exception as e:
             log.warning("engineering_intelligence_failed", error=str(e)) 
             state["context"]["engineering"] ={"insights": [], "error": str(e)}
@@ -231,7 +231,7 @@ class PlannerAgent(BaseAgent):
         thread_id= (context or {}).get("thread_id") or f"workspace:{workspace_id}"
         run_config= {"configurable": {"thread_id":thread_id}}
         try:
-            final_state = await self. graph.ainvoke(initial_state, config=run_config)
+            final_state = await self.graph.ainvoke(initial_state, config=run_config)
             self._log_run_complete (workspace_id, list(final_state["output"].keys()))
             return final_state["output"]
         except Exception as e:

@@ -58,7 +58,7 @@ async def list_workspaces(current_user: CurrentUserDep, db: SessionDep, page: in
         pages=1 if workspaces else 0,
     )
 
-@router.get("/(workspace_id)", response_model=WorkspaceResponse)
+@router.get("/{workspace_id}", response_model=WorkspaceResponse)
 async def get_workspace(workspace_id: str, current_user: CurrentUserDep, db: SessionDep):
     ensure_workspace_access(current_user, workspace_id)
     service=WorkspaceService(db)
@@ -67,7 +67,7 @@ async def get_workspace(workspace_id: str, current_user: CurrentUserDep, db: Ses
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found")
     return workspace
 
-@router.patch("/(workspace_id)", response_model=WorkspaceResponse)
+@router.patch("/{workspace_id}", response_model=WorkspaceResponse)
 async def update_workspace(
     workspace_id: str,
     payload: WorkspaceUpdate,
@@ -78,10 +78,10 @@ async def update_workspace(
     service=WorkspaceService(db)
     workspace = await service.update(workspace_id, payload)
     if not workspace:
-        raise HTTPException(status_code=status.HTTP_484_NOT_FOUND, detail="Workspace not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found")
     return workspace
 
-@router.delete("/(workspace_id)", response_model=MessageResponse)
+@router.delete("/{workspace_id}", response_model=MessageResponse)
 async def delete_workspace (workspace_id: str, current_user: CurrentUserDep, db: SessionDep):
     ensure_workspace_access(current_user, workspace_id)
     service=WorkspaceService(db)

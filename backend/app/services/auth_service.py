@@ -35,7 +35,7 @@ class AuthService:
         ws_name = f"{first_name}'s Workspace"
         ws_slug = await self._unique_workspace_slug(slugify(ws_name) or "workspace")
         workspace=Workspace(
-            id-str(uuid.uuid4()),
+            id=str(uuid.uuid4()),
             name=ws_name,
             slug=ws_slug,
             description="Auto-created on registration.", 

@@ -37,7 +37,7 @@ def require_min_role(min_role: str) -> Callable:
         if getattr(current_user, "is_superuser", False): 
             return current_user 
         user_role=getattr(current_user, "role", "viewer") 
-        if _rank(user_role) > threshold:
+        if _rank(user_role) >= threshold:
             return current_user
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

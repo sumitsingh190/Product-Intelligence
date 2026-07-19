@@ -1,14 +1,1 @@
-{
-    "compilerOptions": {
-        "target": "ES2022",
-        "lib": ["ES2022"],
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
-        "isolatedModules": true,
-        "moduleDetection": "force",
-        "noEmit": true,
-        "strict": true
-    },
-    "include": ["vite.config.ts"]
-}
+{"compilerOptions":{"target":"ESNext","lib":["ESNext","DOM","WebWorker"],"module":"ESNext","moduleResolution":"bundler","isolatedModules":true,"moduleDetection":"force","composite":true,"strict":true,"types":["node"],"skipLibCheck":true},"include":["vite.config.ts"]}

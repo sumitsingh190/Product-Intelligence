@@ -1,0 +1,61 @@
+groups:
+  - name: productos-ai
+    interval: 305
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total(status=~"5..")[5m])) 
+          /clamp_min(sum(rate(http_requests_total[5m])), 1)
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: productos-backend
+        annotations:
+          summary: "Backend 5xx error rate > 5%"
+          description: "5xx error rate {{ $value | humanizePercentage }} over the last 5m."
+
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket[5m]))
+          ) > 1.5
+        for: 10m
+        labels:
+          severity: warning
+          service: productos-backend
+        annotations:
+          summary: "p95 latency > 1.55"
+          description: "p95 API latency is {{$value}}s over the last 5m."
+
+      - alert: BackendDown
+        expr: up{job="productos_backend"}==0
+        alert: BackendDown
+        for: 2m
+        labels:
+          severity: critical
+          service: productos-backend
+        annotations:
+          summary: "ProductOS AI backend is DOWN"
+          description: "/metrics has been unreachable for 2+ minutes."
+
+      - alert: MemoryGrowing
+        expr: |
+          process_resident_memory_bytes{job="productos_backend"} > 2*1024*1024*1024
+        for: 15m
+        labels:
+          severity: warning
+          service: productos-backend
+        annotations:
+          summary: "Backend RSS > 2 GiB"
+          description: "Backend RSS = {{ $value | humanize1024 })B for 15+ minutes (possible leak)."
+
+      - alert: NoRequests Received
+        expr: sum(rate(http_requests_total[10m])) == 0
+        for: 15m
+        labels:
+          severity: warning
+          service: productos-backend
+        annotations:
+          summary: "No HTTP traffic to backend for 15m"
+          description: "Either the frontend is broken or the service is partitioned."

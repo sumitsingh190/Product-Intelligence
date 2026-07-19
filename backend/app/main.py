@@ -66,7 +66,7 @@ def create_app() -> FastAPI:
     # Request ID middleware
     @app.middleware("http")
     async def request_id_nodleware(request: Request, call_next):
-        request_id = request.headers.get("X=Request=ID", str(uuid.uuid4()))
+        request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
         start_time = time.perf_counter()
         
         structlog.contextvars.clear_contextvars()

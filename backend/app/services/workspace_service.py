@@ -20,7 +20,7 @@ class WorkspaceService:
             name=payload.name,
             slug=slug,
             description=payload.description,
-            workspace_type=payload.workspace_fype,
+            workspace_type=payload.workspace_type,
             config=payload.config,
         )
         self.db.add(workspace)

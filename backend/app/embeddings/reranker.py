@@ -32,7 +32,7 @@ STOPWORDS = {
     "those", "over", "such", "some", "than", "then", "very", "just", "also",
 }
 
-_TOKEN_RE = re.compile(r" [a-z0-9]{2,}")
+_TOKEN_RE = re.compile(r"[a-z0-9]{2,}")
 
 #BM25 constants Okapi defaults, no need to tune for our tiny candidate sets.
 
@@ -95,7 +95,7 @@ def _bm25_scores(query_terms: list [str], docs: list[list[str]]) -> list[float]:
 
             score += idf[term] * (numerator / denominator)
         scores.append(score)
-        return scores
+    return scores
 
 def _query_coverage(query_terms: list[str], doc_tokens: list[str]) -> float:
     if not query_terms:

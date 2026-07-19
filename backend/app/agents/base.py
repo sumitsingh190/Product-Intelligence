@@ -1,7 +1,4 @@
-from abc import ABC, abstractmethod
-from typing import Any, TypedDict
-
-from __future__ import annotations
+from __future__ import annotations`r`n`r`nfrom abc import ABC, abstractmethod`r`nfrom typing import Any, TypedDict
 import structlog
 from langchain_core.messages import BaseMessage
 

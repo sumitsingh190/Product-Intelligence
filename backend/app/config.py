@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, computed_field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -35,8 +35,8 @@ class Settings(BaseSettings):
     postgres_db: str = "productos_ai"
     postgres_user: str = "productos"
     postgres_password: str = "productos_password"
-    database_url: str = "url"
-    database_url_sync: str = "url"
+    database_url: str = "postgresql+asyncpg://productos:productos_password@localhost:5432/productos_ai"
+    database_url_sync: str = "postgresql://productos:productos_password@localhost:5432/productos_ai"
     db_pool_size: int = 20
     db_max_overflow: int = 40
     db_pool_timeout: int = 30
@@ -44,15 +44,15 @@ class Settings(BaseSettings):
 
 
     #Redis
-    redis_url : str = "url"
+    redis_url : str = "redis://localhost:6379/0"
     cache_ttl_short: int = 300
     cache_ttl_medium: int = 3600
     cache_ttl_long: int = 86400
 
 
     #Celery
-    celery_broker_url: str = "redis_url"
-    celery_result_backend: str = "redis_url"
+    celery_broker_url: str = "redis://localhost:6379/0"
+    celery_result_backend: str = "redis://localhost:6379/0"
 
     #Groq LLM
     groq_api_key: str = ""
@@ -66,7 +66,7 @@ class Settings(BaseSettings):
     google_api_key: str= ""
     embedding_model: str = "models/text-embedding-004"
     embedding_dimension: int = 768
-    embedding_task_type: str = "RETREIVAL_DOCUMENT"
+    embedding_task_type: str = "RETRIEVAL_DOCUMENT"
     embedding_batch_size: int = 100
 
 
@@ -78,7 +78,7 @@ class Settings(BaseSettings):
 
     #Agent memory
     agent_memory_enabled: bool = True
-    agent_checkpoint_redis_url : str = "redis url"
+    agent_checkpoint_redis_url : str = "redis://localhost:6379/1"
 
     # DuckDB
     duckdb_path : str = "./data/analytics.duckdb"
@@ -98,6 +98,11 @@ class Settings(BaseSettings):
     otel_service_name : str = "productos-ai-backend"
     otel_exporter_otlp_endpoint : str = "http://localhost:4317"
     prometheus_enabled : bool = True
+
+    @computed_field
+    @property
+    def is_production(self) -> bool:
+        return self.app_env == "production"
 
     #Feature Flags
     feature_competitor_intelligence : bool = True

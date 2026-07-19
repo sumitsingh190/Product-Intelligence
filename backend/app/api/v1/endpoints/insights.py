@@ -47,7 +47,7 @@ async def update_insight_status(
     service=InsightService(db)
     insight = await service.get_by_id(insight_id)
     if not insight:
-        raise HTTPException(status_code=status.HTTP_404_HOT_FOUND, detail="Insight not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Insight not found")
     ensure_workspace_access(current_user, insight.workspace_id)
     return await service.update_status(insight_id, payload.status)
 
@@ -62,4 +62,4 @@ async def trigger_analysis(
     ensure_workspace_access(current_user, workspace_id) 
     from app.tasks.analysis_tasks import run_workspace_analysis
     task = run_workspace_analysis.delay(workspace_id) 
-    return {"task id": task.id, "status": "queued"}
+    return {"task_id": task.id, "status": "queued"}

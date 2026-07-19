@@ -1,0 +1,125 @@
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name "productos-ai-backend"
+version = "0.1.0"
+description = "ProductOS AI - Autonomous Product Operating System backend"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.5",
+    "uvicorn[standard]==0.34.0",
+    "gunicorn==23.0.0",
+    "python-multipart==0.0.20",
+    "httpx==0.28.1",
+
+    #Database - PostgreSQL (async)
+    "sqlalchemy[asyncio]==2.0.36",
+    "asyncpg==0.30.0",
+    "psycopg2-binary==2.9.10",
+    "alembic==1.14.0",
+    "pgvector==0.3.6",
+
+    #Database DuckDB (analytics)
+    "duckdb==1.1.3",
+    "polars==1.17.1",
+    "pyarrow==18.1.0",
+    
+    #Cache / Message broker
+    "redis[hiredis]==5.2.1",
+    "celery[redis]==5.4.0",
+
+    # Configuration & validation
+    "pydantic==2.10.4",
+    "pydantic-settings==2.7.0",
+    "python-dotenv==1.0.1",
+    
+    # Security & auth
+    "python-jose[cryptography]==3.3.0",
+    "passlib[bcrypt]==1.7.4",
+
+    #AI- LangGraph / LangChain
+    "langgraph==0.2.60",
+    "langchain-core==0.3.28",
+
+# Optional Redis-backed checkpointer for cross-worker agent state.
+# If the pin fails, remove this line get_checkpointer() falls back to MemorySaver.
+    "langgraph-checkpoint-redis>=0.0.4",
+
+    #AI Groq (LLM provider)
+    "langchain-groq==0.2.2",
+    "groq==0.15.0",
+
+    #ΑΙ Google AI Studio (embeddings)
+    "google-generativeai==0.8.3",
+    
+    #HTTP clients
+    "aiohttp==3.11.11",
+    "httpx==0.28.1",
+    
+    #Data processing
+    "pandas==2.2.3",
+    "numpy==2.2.0",
+    "orjson=-3.10.12",
+
+    # Observability
+    "structlog==24.4.0",
+    "opentelemetry-sdk==1.29.0",
+    "opentelemetry-api==1.29.0",
+    "opentelemetry-instrumentation-fastapi==0.50b0",
+    "opentelemetry-instrumentation-sqlalchemy==0.50b0",
+    "opentelemetry-instrumentation-redis==0.50b0",
+    "opentelemetry-exporter-otlp==1.29.0",
+    "prometheus-client==0.21.1",    
+    "prometheus-fastapi-instrumentator==7.0.0",
+
+    # Utilities
+    "python-slugify==8.0.4",
+    "jinja2==3.1.5",
+    "markdown==3.7",
+    "weasyprint==63.1",
+    "beautifulsoup4==4.12.3",
+    "lxml==5.3.0",
+    "feedparser==6.0.11",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "pytest-asyncio==0.25.0",
+    "pytest-cov==6.0.0", 
+    "pytest-mock==3.14.0",
+    "httpx==0.28.1",
+    "ruff==0.8.6",
+    "mуру==1.14.0",
+    "pre-commit==4.0.1",
+    "ipython==8.31.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v--tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+ignore = ["E501", "B008", "B904"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]

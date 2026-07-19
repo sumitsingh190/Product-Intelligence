@@ -13,7 +13,7 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     full_name: str | None = Field(None, min_length=1, max_length=255)
     avatar_url: str | None = None
-    password: str | None = Field(None, min_leagth=8, max_length=128)
+    password: str | None = Field(None, min_length=8, max_length=128)
 
 class UserResponse (UserBase, TimestampSchema):
     id: str

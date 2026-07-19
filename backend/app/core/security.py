@@ -43,7 +43,7 @@ def verify_access_token(token: str) -> dict[str, Any] | None:
         payload=jwt.decode(
             token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm] )
         
-        if payload.get("type") != "success": 
+        if payload.get("type") != "access": 
             return None 
         return payload
     except JWTError:

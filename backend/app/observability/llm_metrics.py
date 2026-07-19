@@ -97,7 +97,7 @@ class LLMMetricsCallback(AsyncCallbackHandler):
     ) -> None:
 
         model = self._resolve_model(serialized, kwargs)
-        self._starts[run_id] (time.perf_counter(), model)
+        self._starts[run_id] = (time.perf_counter(), model)
 
     async def on_chat_model_start(
         self,
@@ -159,8 +159,8 @@ class LLMMetricsCallback(AsyncCallbackHandler):
         put it under usage_metadata on the generation itself.
         """
         out=response.llm_output or {}
-        usage=out.get("token_usage") or out.get("usage") or ()
-        pt=int(usage.get("prompt tokens") or usage.get("input tokens") or 0)
+        usage=out.get("token_usage") or out.get("usage") or {}
+        pt=int(usage.get("prompt_tokens") or usage.get("input_tokens") or 0)
         ct=int(usage.get("completion_tokens") or usage.get("output tokens") or 0)
         if pt or ct:
             return pt, ct

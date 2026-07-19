@@ -1,227 +1,51 @@
-# Development Docker Compose
-
-x-backend-env: &backend-env
-  env file:
-    - .env
-  
-  environment:
-    - POSTGRES_HOST=postgres
-    - REDIS_HOST-redis
-    - REDIS_URL=redis://redis:6379/0
-    - CELERY_BROKER_URL=redis://redis:6379/1
-    - CELERY_RESULT_BACKEND=redis://redis:6379/2
-    - AGENT_CHECKPOINT_REDIS_URL=redis://redis:6379/3
-    - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-productos}: ${POSTGRES_PASSWORD:-productos_password}@postgres:5432/${POSTGRES_DB:-productos_ai}
-    - DATABASE_URL_SYNC=postgresql://${POSTGRES_USER:-productos}: ${POSTGRES PASSWORD:-productos_password}@postgres:5432/${POSTGRES_DB:-productos_ai}
-    - DUCKDB_PATH=/app/data/analytics.duckdb
-
-
 services:
-#Infrastructure
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: productos_postgres
-    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-productos_ai}
       POSTGRES_USER: ${POSTGRES_USER:-productos}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-productos_password)
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-productos} -d ${POSTGRES_DB:-productos_ai}"]
-      interval: 105
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
       timeout: 5s
-      retries: 5
-    networks:
-      - productos_network
-
+      retries: 10
   redis:
     image: redis:7.4-alpine
-    container_name: productos_redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes: [redis_data:/data]
+    ports: ["6379:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
-      timeout: 55
-      retries: 5
-    networks:
-      - productos_network
-
-# Backend
+      timeout: 5s
+      retries: 10
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    container_name: productos_backend
-    restart: unless-stopped
-    <<: *backend-env
-    volumes:
-      - ./backend:/app
-      - backend_data:/app/data
-    ports:
-      - "8000:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    command: uvicorn app.main:apphost 0.0.0.0-port 8000 --reload
-    networks:
-      - productos_network
-
-
-  celery_worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    container_name: productos_celery_worker
-    restart: unless-stopped
-    <<: *backend-env
-    volumes:
-      - ./backend:/app
-      - backend_data:/app/data
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    command: celery -A app.tasks.celery_app worker --loglevel=info --concurrency=4 -Q default,ingestion,analysis,reporting
-    networks:
-      - productos_network
-
-
-  celery_beat:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    container_name: productos_celery_beat
-    restart: unless-stopped
-    <<: *backend-env
-    volumes:
-      - ./backend:/app
-      - backend_data:/app/data
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-  #command: celery A app.tasks.celery_app beat-loglevel-info-scheduler django_celery_beat.schedule
-    command: celery -A app.tasks.celery_app beat --loglevel=info
-    networks:
-      - productos_network
-
-  flower:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    container_name: productos_flower
-    restart: unless-stopped
-    <<: *backend-env
-    volumes:
-      - ./backend:/app
-    ports:
-      - "5555:5555"
-    depends on:
-      redis:
-        condition: service_healthy
-    command: celery -A app.tasks.celery_app flower -port=5555
-    networks:
-      - productos_network
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      target: development
-    container_name: productos_frontend
-    restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    networks:
-      - productos_network
-
-# Observability
-  prometheus:
-    image: prom/prometheus:v2.55.1
-    container_name: productos_prometheus
-    restart: unless-stopped
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
-    volumes:
-      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./infrastructure/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
-      - prometheus_data:/prometheus
-    ports:
-      - "9090:9090"
-    networks:
-      - productos_network
-
-  grafana:
-    image: grafana/grafana:11.3.1
-    restart: unless-stopped
-    container_name: productos grafana
+    build: { context: ./backend, target: development }
+    env_file: .env
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./infrastructure/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-    ports:
-      - "3001:3000"
+      POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      AGENT_CHECKPOINT_REDIS_URL: redis://redis:6379/3
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-productos}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@postgres:5432/${POSTGRES_DB:-productos_ai}
+      DATABASE_URL_SYNC: postgresql://${POSTGRES_USER:-productos}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@postgres:5432/${POSTGRES_DB:-productos_ai}
+      DUCKDB_PATH: /app/data/analytics.duckdb
+    volumes: [./backend:/app, backend_data:/app/data]
+    ports: ["8000:8000"]
     depends_on:
-      - prometheus
-    networks:
-      - productos_network
-
-  otel_collector:
-    image: otel/opentelemetry-collector-contrib:0.114.0
-    container_name: productos_otel
-    restart: unless-stopped
-    command: ["--config=/etc/otel-collector-config.yml"]
-    volumes:
-      - ./infrastructure/otel/otel-collector.yml:/etc/otel-collector-config.yml:ro
-    ports:
-      - "4317:4317" #OTLP BRPC
-      - "4318:4318" #OTLP HTTP
-      - "8888:8888" #Prometheus metrics exposed by the collector
-    networks:
-      - productos_network
-
-#Volumes
-
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+  frontend:
+    build: { context: ./frontend, target: development }
+    environment: { VITE_API_BASE_URL: http://localhost:8000 }
+    volumes: [./frontend:/app, /app/node_modules]
+    ports: ["5173:5173"]
+    depends_on: [backend]
 volumes:
   postgres_data:
   redis_data:
-  backend data:
-  prometheus_data:
-  grafana_data:
-
-networks:
-  productos_network:
-    driver: bridge
+  backend_data:
