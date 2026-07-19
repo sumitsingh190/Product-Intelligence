@@ -488,7 +488,7 @@ AI Engineer | Backend Engineer | Product Intelligence
   </a>
 
   <a href="https://www.linkedin.com/in/sumitprakash13" target="_blank">
-    <img src="https://img.shields.io/badge/LinkedIn-Sumit%20Singh-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/>
+    <img src="https://img.shields.io/badge/LinkedIn-Sumit%20Prakash-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/>
   </a>
 </p>
 
