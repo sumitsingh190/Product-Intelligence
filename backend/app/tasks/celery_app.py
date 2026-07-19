@@ -23,6 +23,14 @@ celery_app.conf.update(
     task_track_started=True,
     task_acks_late=True,
     worker_prefetch_multiplier=1,
+    task_default_retry_delay=60,      # Retry after 60 seconds
+    task_annotations={
+        "*": {
+            "rate_limit": "100/m",
+        }
+    },
+    broker_connection_retry_on_startup=True,
+    broker_connection_max_retries=None,
     task_routes={
         "app.tasks.ingestion_tasks.*": {"queue": "ingestion"},
         "app.tasks.analysis_tasks.*": {"queue": "analysis"},

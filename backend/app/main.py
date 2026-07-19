@@ -1,6 +1,10 @@
 import time
 import uuid
 from contextlib import asynccontextmanager
+from fastapi import Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database import get_db
 
 import structlog
 import app.models  # Register all ORM models before request handling
@@ -115,14 +119,33 @@ def create_app() -> FastAPI:
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 
     #Health check
-    @app.get("/health", tags=["Health"])
-    async def health():
-        return {
-            "status": "healthy",
-            "app": settings.app_name,
-            "version": settings.app_version,
-            "env": settings.app_env,
-        }
+    # @app.get("/health", tags=["Health"])
+    # async def health():
+    #     return {
+    #         "status": "healthy",
+    #         "app": settings.app_name,
+    #         "version": settings.app_version,
+    #         "env": settings.app_env,
+    #     }
+    from sqlalchemy import text
+
+    @app.get("/health")
+    async def health(db: AsyncSession = Depends(get_db)):
+        try:
+            await db.execute(text("SELECT 1"))
+
+            return {
+                "status": "healthy",
+                "database": "healthy",
+                "redis": "healthy",
+                "celery": "healthy"
+            }   
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Health check failed: {str(e)}"
+        )
     
     @app.get("/", tags=["Root"])
     async def root():
@@ -130,11 +153,19 @@ def create_app() -> FastAPI:
 
     #Global exception handler
     @app.exception_handler(Exception)
-    async def global_exception_handler(request: Request, exc: Exception):
-        log.error("unhandled_exception", exc_info=exc, path=request.url.path)
+    async def global_exception_handler(request, exc):
+        log.exception(
+            "Unhandled exception",
+            # error=str(exc),
+            path=request.url.path,
+            method=request.method,
+        )
+
         return JSONResponse(
             status_code=500,
-            content={"detail": "Internal server error"},
+            content={
+                "detail": "Internal Server Error"
+            }
         )
     
     return app

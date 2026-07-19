@@ -8,7 +8,7 @@ from app.tasks.celery_app import celery_app
 
 log=structlog.get_logger()
 
-@celery_app.task(bind=True, name="app.tasks.ingestion_tasks. ingest_data_source", max_retries=3)
+@celery_app.task(bind=True, name="app.tasks.ingestion_tasks.ingest_data_source", max_retries=3)
 def ingest_data_source(self, data_source_id: str):
     """Ingest data from a single data source."""
     return asyncio.run(_async_ingest_data_source(data_source_id))
@@ -100,7 +100,7 @@ def snapshot_workspace_kpis(workspace_id: str) -> dict:
     cache_delete_prefix(f"kpi: {workspace_id}:") 
     return {"workspace_id": workspace_id, "snapshots_written": written}
 
-@celery_app.task(name="app.tasks Jingestion_tasks.snapshot_all_workspaces")
+@celery_app.task(name="app.tasks.ingestion_tasks.snapshot_all_workspaces")
 def snapshot_all_workspaces() -> dict:
     """Queue KPI snapshots for every active workspace (runs nightly)."""
     return asyncio.run(_async_snapshot_all_workspaces())
