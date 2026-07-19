@@ -26,14 +26,14 @@ async def list_reports(
         select(Document)
         .where(Document.workspace_id == workspace_id)
         .order_by(Document.created_at.desc())
-        .offset((page = 1) * page_size)
+        .offset((page - 1) * page_size)
         .limit(page_size)
     )
     documents = result.scalars().all()
     count_result = await db.execute(
         select(func.count()).select_from(Document).where(Document.workspace_id == workspace_id) )
     total = count_result.scalar_one()
-    pages = (total + page_size = 1) // page_size
+    pages = (total + page_size - 1) // page_size
 
     return PaginatedResponse(
         items=documents, total=total, page=page, page_size=page_size, pages=pages)
@@ -85,7 +85,9 @@ async def export_report(
 
     if format == "markdown":
         return Response(
-            content=document.content, media_type="text/markdown", headers={"Content=Disposition": f'attachment; filename="(safe_filename).ad"'},
+            content=document.content,
+            media_type="text/markdown",
+            headers={"Content-Disposition": f'attachment; filename="{safe_filename}.md"'},
         )
     
     import markdown as md 
@@ -103,32 +105,33 @@ async def export_report(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"PDF rendering failed: (e)",
+            detail=f"PDF rendering failed: {e}",
         )
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content=Disposition": f'attachment, filename="{safe_filename}.pdf"'}, )
+        headers={"Content-Disposition": f'attachment; filename="{safe_filename}.pdf"'},
+    )
 
 def _wrap_html(title: str, body_html: str) -> str:
 
     return f"""<!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf=8" />
-<title>(title)</title>
+<meta charset=\"utf-8\" />
+<title>{title}</title>
 <style>
     @page {{ size: A4; margins: 2cm; }}
-    body {{ font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1f29; line-height: 1.5; font-size: 11pt; }}
-    h1 {{ font-size: 22pt; margin-bottom: 0.5em; border-bottom: 2px solid #6366f1; padding-bottom: 0.2 }}
+    body {{ font-family: -apple-system, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif; color: #1f2937; line-height: 1.5; font-size: 11pt; }}
+    h1 {{ font-size: 22pt; margin-bottom: 0.5em; border-bottom: 2px solid #6366f1; padding-bottom: 0.2em; }}
     h2 {{ font-size: 15pt; margin-top: 1.5em; color: #4f46e5; }}
     h3 {{ font-size: 12pt; margin-top: 1em; }}
     code {{ background: #f3f4f6; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.95em; }}
     pre {{ background: #f3f4f6; padding: 0.8em; border-radius: 5px; overflow-x: auto; }}
     table {{ border-collapse: collapse; width: 100%; margin: 1em 0; }}
     th, td {{ border: 1px solid #e5e7eb; padding: 0.4em 0.6em; text-align: left; }}
-    th {{background: #f9fafb; }}
-    blockquote {{ border-left: 3px solid #c7d2fe; padding-left: 1em; color: #465563; }}
+    th {{ background: #f9fafb; }}
+    blockquote {{ border-left: 3px solid #c7d2fe; padding-left: 1em; color: #4b5563; }}
     ul, ol {{ padding-left: 1.6em; }}
 </style>
 </head>

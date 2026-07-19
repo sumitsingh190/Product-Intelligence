@@ -3,7 +3,7 @@ requires = ["setuptools>=75.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name "productos-ai-backend"
+name = "productos-ai-backend"
 version = "0.1.0"
 description = "ProductOS AI - Autonomous Product Operating System backend"
 requires-python = ">=3.12"
@@ -31,7 +31,8 @@ dependencies = [
     "celery[redis]==5.4.0",
 
     # Configuration & validation
-    "pydantic==2.10.4",
+    "pydantic[email]==2.10.4",
+    "email-validator==2.2.0",
     "pydantic-settings==2.7.0",
     "python-dotenv==1.0.1",
     
@@ -56,12 +57,11 @@ dependencies = [
     
     #HTTP clients
     "aiohttp==3.11.11",
-    "httpx==0.28.1",
     
     #Data processing
     "pandas==2.2.3",
     "numpy==2.2.0",
-    "orjson=-3.10.12",
+    "orjson==3.10.12",
 
     # Observability
     "structlog==24.4.0",
@@ -92,7 +92,7 @@ dev = [
     "pytest-mock==3.14.0",
     "httpx==0.28.1",
     "ruff==0.8.6",
-    "mуру==1.14.0",
+    "mypy==1.14.0",
     "pre-commit==4.0.1",
     "ipython==8.31.0",
 ]
@@ -103,7 +103,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v--tb=short"
+addopts = "-v --tb=short"
 
 [tool.ruff]
 line-length = 100

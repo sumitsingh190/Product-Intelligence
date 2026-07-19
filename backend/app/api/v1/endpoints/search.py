@@ -66,23 +66,24 @@ async def search(
         doc_rows = await db.execute(
             text(
                 """
-                SELECT id, title, content preview, document type,
-                        NULL:: float AS similarity,
-                        similarity(coalesce(content_preview, '') || ' ' || coalesce(title, ''), :q) AS keyword_score,
-                        ts_rank_cd(
-                            to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content_preview, '')),
-                            websearch_to_tsquery('english', :q)
-                        ) AS fts_score
+                SELECT id, title, content_preview, document_type,
+                       NULL::float AS similarity,
+                       similarity(coalesce(content_preview, '') || ' ' || coalesce(title, ''), :q) AS keyword_score,
+                       ts_rank_cd(
+                           to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content_preview, '')),
+                           websearch_to_tsquery('english', :q)
+                       ) AS fts_score
                 FROM documents
-                WHERE workspace_id= :ws
+                WHERE workspace_id = :ws
                 AND (
                     to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content_preview, ''))
-                        @@websearch_to_tsquery('english', :q)
-                    OR similarity(coalesce(content_preview, ") || || coalesce(title, ''), :q) > 0.2
+                        @@ websearch_to_tsquery('english', :q)
+                    OR similarity(coalesce(content_preview, '') || ' ' || coalesce(title, ''), :q) > 0.2
                 )
-                ORDER BY fts_score DESC NULLS LAST, keyword score DESC NULLS LAST
-                LIMIT:k
-                """),
+                ORDER BY fts_score DESC NULLS LAST, keyword_score DESC NULLS LAST
+                LIMIT :k
+                """
+            ),
             {"ws": workspace_id, "q": q, "k": top_k * 3},
         )
 
@@ -95,25 +96,26 @@ async def search(
             "document_type": m["document_type"],
             "kind": "document",
             "similarity": float(m["similarity"]) if m["similarity"] is not None else None,
-            "keyword_score": float(m["keyword score"]) if m["keyword score"] is not None else None,
-            "fts_score": float(m["fts_score"]) if m["fts_score"] is not None else None, })
+            "keyword_score": float(m["keyword_score"]) if m["keyword_score"] is not None else None,
+            "fts_score": float(m["fts_score"]) if m["fts_score"] is not None else None,
+        })
 
     if query_vec is not None:
         chunk_rows = await db.execute(
             text(
                 """
                 SELECT dc.document_id, dc.chunk_index, dc.content,
-                        d.title, d.document_type, 1= (dc.embedding <=> CAST(embedding AS vector)) AS similarity, 
-                        1=(dc.embedding <=> CAST(:embedding AS vector)) AS similarity,
-                        ts_rank_cd( 
-                            to_tsvector('english', coalesce(dc.content, '')), 
-                            websearch_to_tsquery('english',:q) 
-                        ) AS fts_score
+                       d.title, d.document_type,
+                       1 = (dc.embedding <=> CAST(:embedding AS vector)) AS similarity,
+                       ts_rank_cd(
+                           to_tsvector('english', coalesce(dc.content, '')),
+                           websearch_to_tsquery('english', :q)
+                       ) AS fts_score
                 FROM document_chunks dc
                 JOIN documents d ON d.id = dc.document_id
-                WHERE dc.workspace_id=:ws AND dc.embedding IS NOT NULL
-                ORDER BY dc.embedding <=> CAST(embedding AS vector)
-                LIMIT:k
+                WHERE dc.workspace_id = :ws AND dc.embedding IS NOT NULL
+                ORDER BY dc.embedding <=> CAST(:embedding AS vector)
+                LIMIT :k
                 """
             ), 
             {"embedding": str(query_vec), "ws": workspace_id, "q": q, "k" :top_k * 3},
@@ -142,16 +144,16 @@ async def search(
             text(
                 """
                 SELECT id, title, summary AS content_preview,
-                        1= (embedding <=> CAST(embedding AS vector)) AS similarity,
-                        similarity(coalesce (summary, '') || ' ' || coalesce(title, ''), q) AS keyword_score,
-                        ts_rank_cd(
-                            to_tsvector('english', coalesce(title, '') || ' ' || coalesce (summary, '')),
-                            websearch_to_tsquery('english', :q)
-                        ) AS fts_score
+                       1 = (embedding <=> CAST(:embedding AS vector)) AS similarity,
+                       similarity(coalesce(summary, '') || ' ' || coalesce(title, ''), :q) AS keyword_score,
+                       ts_rank_cd(
+                           to_tsvector('english', coalesce(title, '') || ' ' || coalesce(summary, '')),
+                           websearch_to_tsquery('english', :q)
+                       ) AS fts_score
                 FROM insights
-                WHERE workspace_id=:ws AND embedding IS NOT NULL
-                ORDER BY embedding <=> CAST(embedding AS vector)
-                LIMIT:k
+                WHERE workspace_id = :ws AND embedding IS NOT NULL
+                ORDER BY embedding <=> CAST(:embedding AS vector)
+                LIMIT :k
                 """
             ),
             {"embedding": str(query_vec), "ws": workspace_id, "q": q, "k": top_k * 3},
@@ -161,21 +163,21 @@ async def search(
             text(
                 """
                 SELECT id, title, summary AS content_preview,
-                        NULL::float AS similarity,
-                        similarity(coalesce (summary, '') || ' ' || coalesce(title, ''), q) AS keyword_score,
-                        ts_rank_cd(
-                            to_tsvector('english', coalesce(title, '') || ' ' || coalesce (summary, '')),
-                            websearch_to_tsquery('english', :q)
-                        ) AS fts score
+                       NULL::float AS similarity,
+                       similarity(coalesce(summary, '') || ' ' || coalesce(title, ''), :q) AS keyword_score,
+                       ts_rank_cd(
+                           to_tsvector('english', coalesce(title, '') || ' ' || coalesce(summary, '')),
+                           websearch_to_tsquery('english', :q)
+                       ) AS fts_score
                 FROM insights
-                WHERE workspace_id=:ws
+                WHERE workspace_id = :ws
                 AND (
-                    to_tsvector('english', coalesce(title, '') || ' ' || coalesce (summary, ''))
-                        @@websearch_to_tsquery('english', q)
+                    to_tsvector('english', coalesce(title, '') || ' ' || coalesce(summary, ''))
+                        @@ websearch_to_tsquery('english', :q)
                     OR similarity(coalesce(summary, '') || ' ' || coalesce(title, ''), :q) > 0.2
-                    )
-                ORDER BY fts score DESC NULLS LAST, keyword_score DESC NULLS LAST
-                LIMIT:k
+                )
+                ORDER BY fts_score DESC NULLS LAST, keyword_score DESC NULLS LAST
+                LIMIT :k
                 """
             ),
             {"ws": workspace_id, "q": q, "k": top_k *3},
@@ -209,28 +211,28 @@ async def search(
 
     _RRF_K = 60
 
-    def _rank_map(signal: str) -> dict[tuple [str, str], int]:
+    def _rank_map(signal: str) -> dict[tuple[str, str], int]:
         ranked = sorted(
-                (c for c in candidates if c.get(signal) is not None), 
-                key=lambda c: c.get(signal) or 0.0, 
-                reverse=True,
+            (c for c in candidates if c.get(signal) is not None),
+            key=lambda c: c.get(signal) or 0.0,
+            reverse=True,
         )
-        return {(c["kind"], c["id"]): 1 + 1 for 1, c in enumerate (ranked)}
+        return {(c["kind"], c["id"]): index + 1 for index, c in enumerate(ranked)}
 
     rank_vec = _rank_map("similarity")
     rank_fts = _rank_map("fts_score")
     rank_kw = _rank_map("keyword_score")
 
     for c in candidates:
-        key = (c["kind"], ["id"])
+        key = (c["kind"], c["id"])
         score = 0.0
         for rmap in (rank_vec, rank_fts, rank_kw):
-            r = rmap.get(key) 
+            r = rmap.get(key)
             if r is not None:
-                score += 1.0/ (_RRF_K + r) 
+                score += 1.0 / (_RRF_K + r)
         c["rerank_score"] = round(score, 6)
-    
-    candidates.sort(key=lambda c: c.get("rerank score") or 8.0, reverse=True)
+
+    candidates.sort(key=lambda c: c.get("rerank_score") or 0.0, reverse=True)
     
     if settings.feature_rag_reranker:
         from app.embeddings.reranker import rerank

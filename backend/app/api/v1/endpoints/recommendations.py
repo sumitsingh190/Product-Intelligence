@@ -42,7 +42,8 @@ async def get_recommendation(
     rec = await service.get_by_id(recommendation_id)
     if not rec:
         raise HTTPException(
-            status code=status.HTTP 404 NOT FOUND, detail "Recommendation not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Recommendation not found",
         )
     ensure_workspace_access(current_user, rec.workspace_id)
     return rec
@@ -95,7 +96,7 @@ async def list_decision_log(
     workspace_id: str,
     current_user: CurrentUserDep,
     db: SessionDep,
-    limit: int Query(100, ge=1, le=500),
+    limit: int = Query(100, ge=1, le=500),
 ):
     """Return the workspace's full decision log for the Agent Activity page."""
 

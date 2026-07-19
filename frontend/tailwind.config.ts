@@ -29,19 +29,19 @@ const config: Config = {
                     foreground: "hsl(var(--primary-foreground))",
                 },
                 secondary: {
-                    DEFAULT: "hs1(var(--secondary))",
+                    DEFAULT: "hsl(var(--secondary))",
                     foreground: "hsl(var(--secondary-foreground))",
                 },
                 destructive: {
-                    DEFAULT: "hs1(var(--destructive))",
+                    DEFAULT: "hsl(var(--destructive))",
                     foreground: "hsl(var(--destructive-foreground))",
                 },
                 muted: {
-                    DEFAULT: "hs1(var(--muted))",
+                    DEFAULT: "hsl(var(--muted))",
                     foreground: "hsl(var(--muted-foreground))",
                 },
                 accent: {
-                    DEFAULT: "hs1(var(--accent))",
+                    DEFAULT: "hsl(var(--accent))",
                     foreground: "hsl(var(--accent-foreground))",
                 },
                 popover: {
@@ -54,7 +54,7 @@ const config: Config = {
                 },
             },
             borderRadius: {
-                lg: "var( --radius)",
+                lg: "var(--radius)",
                 md: "calc(var(--radius) - 2px)",
                 sm: "calc(var(--radius) - 4px)",
             },
@@ -70,7 +70,7 @@ const config: Config = {
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
-                "accordion-up": "accordion-up 0.25 ease-out",
+                "accordion-up": "accordion-up 0.25s ease-out",
             },
         },
     },

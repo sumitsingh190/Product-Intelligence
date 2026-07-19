@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
-
-from pydantic import Field
+from urllib.parse import quote_plus
+from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -33,14 +33,30 @@ class Settings(BaseSettings):
     postgres_host: str = "localhost"
     postgres_port: int = 5432
     postgres_db: str = "productos_ai"
-    postgres_user: str = "productos"
-    postgres_password: str = "productos_password"
-    database_url: str = "postgresql+asyncpg://productos:productos_password@localhost:5432/productos_ai"
-    database_url_sync: str = "postgresql://productos:productos_password@localhost:5432/productos_ai"
+    postgres_user: str = "postgres"
+    postgres_password: str = "Sumit@1313"
+    # database_url: str = "postgresql+asyncpg://postgres:Sumit%401313@localhost:5432/productos_ai"
+    # database_url_sync: str = "postgresql://postgres:Sumit%401313@localhost:5432/productos_ai"
     db_pool_size: int = 20
     db_max_overflow: int = 40
     db_pool_timeout: int = 30
     db_pool_recycle: int = 3600
+    @computed_field
+    @property
+    def database_url(self) -> str:
+        password = quote_plus(self.postgres_password)
+        return (
+            f"postgresql+asyncpg://{self.postgres_user}:{password}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
+    @computed_field
+    @property
+    def database_url_sync(self) -> str:
+        password = quote_plus(self.postgres_password)
+        return (
+            f"postgresql://{self.postgres_user}:{password}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
 
 
     #Redis

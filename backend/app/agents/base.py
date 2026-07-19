@@ -1,11 +1,15 @@
-from __future__ import annotations`r`n`r`nfrom abc import ABC, abstractmethod`r`nfrom typing import Any, TypedDict
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from typing import Any, TypedDict
+
 import structlog
 from langchain_core.messages import BaseMessage
 
 from app.config import settings
 from app.observability.llm_metrics import LLMMetricsCallback
 
-log=structlog.get_logger()
+log = structlog.get_logger()
 
 _LLM_CALLBACK = LLMMetricsCallback(default_model=settings.groq_model)
 

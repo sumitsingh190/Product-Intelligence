@@ -3,6 +3,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 import structlog
+import app.models  # Register all ORM models before request handling
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -25,11 +26,14 @@ async def lifespan(app: FastAPI):
     log.info("database_connected")
 
     #Verify Redis connectivity
-    from redis.asyncio import Redis
-    redis = Redis.from_url(settings.redis_url)
-    await redis.ping()
-    await redis.aclose()
-    log.info("redis_connected")
+    try:
+        from redis.asyncio import Redis
+        redis = Redis.from_url(settings.redis_url)
+        await redis.ping()
+        await redis.aclose()
+        log.info("redis_connected")
+    except Exception as exc:  # noqa: BLE001
+        log.warning("redis_connectivity_check_failed", error=str(exc))
     
     #Initialize DuckDB analytics schema (idempotent; safe on every boot)
     try:

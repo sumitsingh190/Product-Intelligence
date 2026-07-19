@@ -82,11 +82,11 @@ class CompetitorIntelligenceAgent(BaseAgent):
             structured_llm= self.llm.with_structured_output(CompetitorOutput)
             chain = ANALYSIS_PROMPT | structured_llm
 
-            result : CompetitorOutput = await chain.ainvoke({
+            result: CompetitorOutput = await chain.ainvoke({
                 "workspace_id": workspace_id,
-                "competitor_updates": str(competitor_updates)[:3000]
-                "market_news": str(market_news)[:2000]
-                "product_context": str(product_context)[:1000]
+                "competitor_updates": str(competitor_updates)[:3000],
+                "market_news": str(market_news)[:2000],
+                "product_context": str(product_context)[:1000],
             })
 
             self._log_run_complete(workspace_id, ["updates", "competitive_position"])

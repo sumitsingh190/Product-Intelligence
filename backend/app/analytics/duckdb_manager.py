@@ -21,21 +21,17 @@ def get_connection() -> duckdb.DuckDBPyConnection:
             Path(settings.duckdb_path).parent.mkdir(parents=True, exist_ok=True)
             _connection=duckdb.connect(settings.duckdb_path)
             _connection.execute(f"PRAGMA threads={settings.duckdb_threads}")
-            _connection.execute(f"PRAGMA memory_limit-'{settings.duckdb_memory_limit}'")
+            _connection.execute(f"SET memory_limit='{settings.duckdb_memory_limit}'")
             log.info("duckdb_connected", path=settings.duckdb_path)
     return _connection
 
 @contextmanager
 def get_cursor():
-    conn=get_connection()
-    cursor=conn.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     try:
         yield cursor
-        conn.commit()
-    except Exception:
-        conn.rollback()
-        raise
     finally:
         cursor.close()
 
@@ -68,12 +64,11 @@ def initialize_schema() -> None:
             sentiment_score FLOAT,
             text TEXT,
             reviewed_at TIMESTAMP,
-            synced_at TIMESTAMP DEFAULT CURRENT TIMESTAMP )""",
+            synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP )""",
 
             """CREATE TABLE IF NOT EXISTS support_tickets (
             id VARCHAR PRIMARY KEY,
             workspace_id VARCHAR NOT NULL,
-            source VARCHAR NOT NULL,
             source VARCHAR NOT NULL,
             subject VARCHAR,
             description TEXT,
