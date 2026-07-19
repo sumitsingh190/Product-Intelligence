@@ -57,7 +57,7 @@ async def search(
                 FROM documents
                 WHERE workspace_id = :ws AND embedding IS NOT NULL
                 ORDER BY embedding <=> CAST(:embedding AS vector)
-                LIMIT:k
+                LIMIT :k
                 """
             ),
             {"embedding": str(query_vec), "ws": workspace_id, "q": q, "k": top_k * 3},

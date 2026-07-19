@@ -167,7 +167,7 @@ class GitHubConnector (BaseConnector):
                 stmt=insert(GitHubActivity).values(activity_rows)
                 stmt=stmt.on_conflict_do_update(
                     index_elements=["id"], 
-                    set={
+                    set_={
                         c.name: getattr(stmt.excluded, c.name)
                         for c in GitHubActivity.__table__.columns 
                         if c.name not in {"id", "created_at"}
@@ -180,7 +180,7 @@ class GitHubConnector (BaseConnector):
                 stmt=insert(SupportTicket).values(ticket_rows)
                 stmt=stmt.on_conflict_do_update(
                     index_elements=["id"],
-                    set={
+                    set_={
                         c.name: getattr(stmt.excluded, c.name)
                         for c in SupportTicket.__table__.columns
                         if c.name not in {"id", "created_at"}

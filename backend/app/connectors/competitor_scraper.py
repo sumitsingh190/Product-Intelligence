@@ -151,7 +151,7 @@ async def _persist(
         stmt = insert(CompetitorUpdate).values(rows)
         stmt = stmt.on_conflict_do_update(
             index_elements=["id"],
-            set={
+            set_={
                 c.name: getattr(stmt.excluded, c.name)
                 for c in CompetitorUpdate.__table__.columns 
                 if c.name not in {"id", "created_at"}
