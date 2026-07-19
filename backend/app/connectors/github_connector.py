@@ -39,15 +39,15 @@ class GitHubConnector (BaseConnector):
     source_type = "github"
     BASE_URL="https://api.github.com"
 
-    def __init_(self, config: dict[str, Any]) -> None:
+    def __init__(self, config: dict[str, Any]) -> None:
         super().__init__(config)
         self.token=self._get_config("token")
         self.repos=self._get_config("repos", []) # ["owner/repo"]
         self._client: httpx.AsyncClient | None=None
 
-    def _headers(self) -> dict:
+    def _headers(self) -> dict[str, str]:
         return {
-            "Authorization": f"Bearer (self.token)", 
+            "Authorization": f"Bearer {self.token}", 
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
         }

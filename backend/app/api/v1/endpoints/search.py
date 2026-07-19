@@ -48,7 +48,7 @@ async def search(
             text(
                 """
                 SELECT id, title, content_preview, document_type,
-                        1 = (embedding <=> CAST(:embedding AS vector)) AS similarity, 
+                        1 - (embedding <=> CAST(:embedding AS vector)) AS similarity, 
                         similarity(coalesce(content_preview, '') || ' ' || coalesce(title, ''), :q) AS keyword_score,
                         ts_rank_cd(
                             to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content_preview, "")),
@@ -56,7 +56,7 @@ async def search(
                         ) AS fts_score
                 FROM documents
                 WHERE workspace_id = :ws AND embedding IS NOT NULL
-                ORDER BY embedding <=> CAST(:embeliding AS vector)
+                ORDER BY embedding <=> CAST(:embedding AS vector)
                 LIMIT:k
                 """
             ),
@@ -130,7 +130,7 @@ async def search(
                 best_per_doc[doc_id]= {
                     "id": doc_id,
                     "title": m["title"],
-                    "content_preview": (m["content"] or "") [:500],
+                    "content_preview": (m["content"] or '') [:500],
                     "document_type": m["document_type"],
                     "kind": "document",
                     "similarity": sim,

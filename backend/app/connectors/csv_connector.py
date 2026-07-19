@@ -190,7 +190,7 @@ class CSVUploadConnector (BaseConnector):
             stmt=insert(ProductEvent).values(payload)
             stmt=stmt.on_conflict_do_update(
                 index_elements=["id"],
-                set_={
+                set={
                     c.name: getattr(stmt.excluded, c.name)
                     for c in ProductEvent.__table__.columns
                     if c.name not in {"id", "created_at"}

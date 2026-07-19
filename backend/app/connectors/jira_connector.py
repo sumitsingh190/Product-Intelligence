@@ -41,7 +41,7 @@ class JiraConnector (BaseConnector):
     def _headers(self) -> dict:
         credentials=b64encode(f"{self.email}:{self.api_token}".encode()).decode()
         return {
-            "Authorization": f"Basic (credentials)",
+            "Authorization": f"Basic {credentials}",
             "Accept": "application/json",
             "Content-Type": "application/json",
         }

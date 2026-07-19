@@ -30,7 +30,7 @@ class SlackConnector (BaseConnector):
     source_type="slack"
 
     def __init__(self, config: dict[str, Any]) -> None: 
-        super()._init_(config) 
+        super().__init__(config) 
         self.token: str = self._get_config("bot_token", "") 
         self.channel_ids: list[str] = list(self._get_config("channel_ids", []) or []) 
         self.history_days: int = int(self._get_config("history_days", 7))
@@ -129,7 +129,7 @@ class SlackConnector (BaseConnector):
                 index_elements=["id"],
                 set={ 
                     c.name: getattr(stmt.excluded, c.name) 
-                    for c in SupportTicket._table_.columns 
+                    for c in SupportTicket.__table__.columns 
                     if c.name not in {"id", "created_at"}
                 },
             )
